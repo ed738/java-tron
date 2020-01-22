@@ -46,6 +46,8 @@ public class MarketOrderCapsule implements ProtoCapsule<MarketOrder> {
         .setState(State.ACTIVE)
         .setPrev(ByteString.copyFrom(new byte[0]))
         .setNext(ByteString.copyFrom(new byte[0]))
+        .setAccountPrev(ByteString.copyFrom(new byte[0]))
+        .setAccountNext(ByteString.copyFrom(new byte[0]))
         .build();
   }
 
@@ -192,6 +194,25 @@ public class MarketOrderCapsule implements ProtoCapsule<MarketOrder> {
     }
   }
 
+  public byte[] getAccountNext() {
+    return this.order.getAccountNext().toByteArray();
+  }
+
+  public void setAccountNext(byte[] next) {
+    this.order = this.order.toBuilder()
+        .setAccountNext(ByteString.copyFrom(next))
+        .build();
+  }
+
+  public void setAccountPrev(byte[] prev) {
+    this.order = this.order.toBuilder()
+        .setAccountPrev(ByteString.copyFrom(prev))
+        .build();
+  }
+
+  public boolean isAccountNextNull() {
+    return this.getAccountNext().length == 0;
+  }
 
   @Override
   public byte[] getData() {

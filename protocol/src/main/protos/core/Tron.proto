@@ -77,6 +77,9 @@ message MarketOrder {
 
     bytes prev = 11;
     bytes next = 12;
+
+    bytes account_prev = 13;
+    bytes account_next = 14;
 }
 
 message MarketOrderList {
@@ -93,9 +96,16 @@ message MarketOrderPair{
 }
 
 message MarketAccountOrder {
+  message OrderLinkedList {
+    bytes head = 1;
+    bytes tail = 2;
+  }
+
   bytes owner_address = 1;
-  repeated bytes orders = 2; // order_id list
+  OrderLinkedList orderLinkedList = 2; // order_id linked list
+
   int64 count = 3;
+  int64 active_count = 4;
 
 }
 

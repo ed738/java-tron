@@ -147,16 +147,16 @@ public class MarketCancelOrderActuatorTest {
     try {
       marketAccountOrderCapsule = dbManager.getChainBaseManager()
           .getMarketAccountStore().get(accountAddress);
+
+      MarketOrderStore marketOrderStore = dbManager.getChainBaseManager().getMarketOrderStore();
+
+      List<ByteString> orderIdList = marketAccountOrderCapsule.getOrderIdList(marketOrderStore);
+      orderIdList.forEach(
+          orderId -> marketOrderStore.delete(orderId.toByteArray())
+      );
     } catch (ItemNotFoundException e) {
-      return;
+      logger.error(e.getMessage());
     }
-
-    MarketOrderStore marketOrderStore = dbManager.getChainBaseManager().getMarketOrderStore();
-
-    List<ByteString> orderIdList = marketAccountOrderCapsule.getOrdersList();
-    orderIdList.forEach(
-        orderId -> marketOrderStore.delete(orderId.toByteArray())
-    );
   }
 
   private Any getContract(String address, String sellTokenId, long sellTokenQuantity,
@@ -290,7 +290,7 @@ public class MarketCancelOrderActuatorTest {
 
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore
         .get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(0);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(0, orderStore).getID();
     MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());
     orderCapsule.setState(State.CANCELED);
     orderStore.put(orderId.toByteArray(), orderCapsule);
@@ -323,10 +323,11 @@ public class MarketCancelOrderActuatorTest {
 
     ChainBaseManager chainBaseManager = dbManager.getChainBaseManager();
     MarketAccountStore marketAccountStore = chainBaseManager.getMarketAccountStore();
+    MarketOrderStore orderStore = chainBaseManager.getMarketOrderStore();
 
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore
         .get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(0);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(0, orderStore).getID();
 
     MarketCancelOrderActuator actuator = new MarketCancelOrderActuator();
     actuator.setChainBaseManager(dbManager.getChainBaseManager()).setAny(getContract(
@@ -360,13 +361,15 @@ public class MarketCancelOrderActuatorTest {
     ChainBaseManager chainBaseManager = dbManager.getChainBaseManager();
     MarketAccountStore marketAccountStore = chainBaseManager.getMarketAccountStore();
     AccountStore accountStore = chainBaseManager.getAccountStore();
+    MarketOrderStore orderStore = chainBaseManager.getMarketOrderStore();
+
     AccountCapsule accountCapsule = accountStore.get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
     accountCapsule.setBalance(0L);
     accountStore.put(ByteArray.fromHexString(OWNER_ADDRESS_FIRST), accountCapsule);
 
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore
         .get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(0);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(0, orderStore).getID();
 
     MarketCancelOrderActuator actuator = new MarketCancelOrderActuator();
     actuator.setChainBaseManager(dbManager.getChainBaseManager()).setAny(getContract(
@@ -406,10 +409,11 @@ public class MarketCancelOrderActuatorTest {
 
     ChainBaseManager chainBaseManager = dbManager.getChainBaseManager();
     MarketAccountStore marketAccountStore = chainBaseManager.getMarketAccountStore();
+    MarketOrderStore orderStore = chainBaseManager.getMarketOrderStore();
 
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore
         .get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(0);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(0, orderStore).getID();
 
     MarketCancelOrderActuator actuator = new MarketCancelOrderActuator();
     actuator.setChainBaseManager(dbManager.getChainBaseManager()).setAny(getContract(
@@ -495,7 +499,7 @@ public class MarketCancelOrderActuatorTest {
 
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore
         .get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(2);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(2, orderStore).getID();
 
     // cancel the third order
     cancelOrder(orderId);
@@ -513,7 +517,7 @@ public class MarketCancelOrderActuatorTest {
     //check accountOrder
     accountOrderCapsule = marketAccountStore.get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
     Assert.assertEquals(5, accountOrderCapsule.getCount());
-    orderId = accountOrderCapsule.getOrdersList().get(2);
+    orderId = accountOrderCapsule.getOrderByIndex(2, orderStore).getID();
 
     //check order
     MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());
@@ -574,7 +578,7 @@ public class MarketCancelOrderActuatorTest {
 
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore
         .get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(2);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(2, orderStore).getID();
 
     // cancel the third order
     cancelOrder(orderId);
@@ -590,7 +594,7 @@ public class MarketCancelOrderActuatorTest {
     //check accountOrder
     accountOrderCapsule = marketAccountStore.get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
     Assert.assertEquals(5, accountOrderCapsule.getCount());
-    orderId = accountOrderCapsule.getOrdersList().get(2);
+    orderId = accountOrderCapsule.getOrderByIndex(2, orderStore).getID();
 
     //check order
     MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());
@@ -651,7 +655,7 @@ public class MarketCancelOrderActuatorTest {
 
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore
         .get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(1);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(1, orderStore).getID();
 
     // cancel the second order
     cancelOrder(orderId);
@@ -670,7 +674,7 @@ public class MarketCancelOrderActuatorTest {
     //check accountOrder
     accountOrderCapsule = marketAccountStore.get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
     Assert.assertEquals(3, accountOrderCapsule.getCount());
-    orderId = accountOrderCapsule.getOrdersList().get(1);
+    orderId = accountOrderCapsule.getOrderByIndex(1, orderStore).getID();
 
     //check order
     MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());
@@ -728,7 +732,7 @@ public class MarketCancelOrderActuatorTest {
 
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore
         .get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(0);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(0, orderStore).getID();
 
     // cancel the second order
     cancelOrder(orderId);
@@ -747,7 +751,7 @@ public class MarketCancelOrderActuatorTest {
     //check accountOrder
     accountOrderCapsule = marketAccountStore.get(ByteArray.fromHexString(OWNER_ADDRESS_FIRST));
     Assert.assertEquals(1, accountOrderCapsule.getCount());
-    orderId = accountOrderCapsule.getOrdersList().get(0);
+    orderId = accountOrderCapsule.getOrderByIndex(0, orderStore).getID();
 
     //check order
     MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());

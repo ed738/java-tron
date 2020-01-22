@@ -2311,7 +2311,8 @@ public class Wallet {
     return nodeListBuilder.build();
   }
 
-  public MarketOrderList getMarketOrderByAccount(ByteString accountAddress) {
+  public MarketOrderList getMarketOrderByAccount(ByteString accountAddress)
+      throws ItemNotFoundException {
 
     if (accountAddress == null || accountAddress.isEmpty()) {
       return null;
@@ -2328,7 +2329,7 @@ public class Wallet {
     MarketOrderStore marketOrderStore = dbManager.getChainBaseManager().getMarketOrderStore();
 
     MarketOrderList.Builder marketOrderListBuilder = MarketOrderList.newBuilder();
-    List<ByteString> orderIdList = marketAccountOrderCapsule.getOrdersList();
+    List<ByteString> orderIdList = marketAccountOrderCapsule.getOrderIdList(marketOrderStore);
 
     orderIdList.forEach(
         orderId -> {

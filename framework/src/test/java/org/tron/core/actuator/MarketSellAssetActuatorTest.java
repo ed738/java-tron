@@ -194,16 +194,17 @@ public class MarketSellAssetActuatorTest {
     try {
       marketAccountOrderCapsule = dbManager.getChainBaseManager()
           .getMarketAccountStore().get(accountAddress);
+
+      MarketOrderStore marketOrderStore = dbManager.getChainBaseManager().getMarketOrderStore();
+
+      List<ByteString> orderIdList = marketAccountOrderCapsule.getOrderIdList(marketOrderStore);
+      orderIdList.forEach(
+          orderId -> marketOrderStore.delete(orderId.toByteArray())
+      );
     } catch (ItemNotFoundException e) {
-      return;
+      logger.error(e.getMessage());
     }
 
-    MarketOrderStore marketOrderStore = dbManager.getChainBaseManager().getMarketOrderStore();
-
-    List<ByteString> orderIdList = marketAccountOrderCapsule.getOrdersList();
-    orderIdList.forEach(
-        orderId -> marketOrderStore.delete(orderId.toByteArray())
-    );
   }
 
   private Any getContract(String address, String sellTokenId, long sellTokenQuantity,
@@ -970,10 +971,9 @@ public class MarketSellAssetActuatorTest {
     //check accountOrder
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore.get(ownerAddress);
     Assert.assertEquals(1, accountOrderCapsule.getCount());
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(0);
 
     //check order
-    MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());
+    MarketOrderCapsule orderCapsule = accountOrderCapsule.getOrderByIndex(0, orderStore);
     Assert.assertEquals(orderCapsule.getSellTokenQuantityRemain(), sellTokenQuant);
 
     //check pairToPrice
@@ -995,7 +995,7 @@ public class MarketSellAssetActuatorTest {
         .get(pairPriceKey);
     Assert.assertEquals(1, orderIdListCapsule.getOrderSize(orderStore));
     Assert.assertArrayEquals(orderIdListCapsule.getHead(),
-        orderId.toByteArray());
+        orderCapsule.getID().toByteArray());
   }
 
   /**
@@ -1045,10 +1045,9 @@ public class MarketSellAssetActuatorTest {
     //check accountOrder
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore.get(ownerAddress);
     Assert.assertEquals(1, accountOrderCapsule.getCount());
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(0);
 
     //check order
-    MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());
+    MarketOrderCapsule orderCapsule = accountOrderCapsule.getOrderByIndex(0, orderStore);
     Assert.assertEquals(orderCapsule.getSellTokenQuantityRemain(), sellTokenQuant);
 
     //check pairToPrice
@@ -1070,7 +1069,7 @@ public class MarketSellAssetActuatorTest {
         .get(pairPriceKey);
     Assert.assertEquals(1, orderIdListCapsule.getOrderSize(orderStore));
     Assert.assertArrayEquals(orderIdListCapsule.getHead(),
-        orderId.toByteArray());
+        orderCapsule.getID().toByteArray());
   }
 
 
@@ -1121,10 +1120,9 @@ public class MarketSellAssetActuatorTest {
     //check accountOrder
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore.get(ownerAddress);
     Assert.assertEquals(1, accountOrderCapsule.getCount());
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(0);
 
     //check order
-    MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());
+    MarketOrderCapsule orderCapsule = accountOrderCapsule.getOrderByIndex(0, orderStore);
     Assert.assertEquals(orderCapsule.getSellTokenQuantityRemain(), sellTokenQuant);
 
     //check pairToPrice
@@ -1146,7 +1144,7 @@ public class MarketSellAssetActuatorTest {
         .get(pairPriceKey);
     Assert.assertEquals(1, orderIdListCapsule.getOrderSize(orderStore));
     Assert.assertArrayEquals(orderIdListCapsule.getHead(),
-        orderId.toByteArray());
+        orderCapsule.getID().toByteArray());
   }
 
 
@@ -1205,7 +1203,8 @@ public class MarketSellAssetActuatorTest {
     //check accountOrder
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore.get(ownerAddress);
     Assert.assertEquals(3, accountOrderCapsule.getCount());
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(2);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(2, orderStore).getID();
+
 
     //check pairToPrice
     byte[] marketPair = MarketUtils.createPairKey(sellTokenId.getBytes(), buyTokenId.getBytes());
@@ -1284,7 +1283,7 @@ public class MarketSellAssetActuatorTest {
     //check accountOrder
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore.get(ownerAddress);
     Assert.assertEquals(3, accountOrderCapsule.getCount());
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(2);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(2, orderStore).getID();
 
     //check pairToPrice
     byte[] marketPair = MarketUtils.createPairKey(sellTokenId.getBytes(), buyTokenId.getBytes());
@@ -1366,7 +1365,7 @@ public class MarketSellAssetActuatorTest {
     //check accountOrder
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore.get(ownerAddress);
     Assert.assertEquals(4, accountOrderCapsule.getCount());
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(3);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(3, orderStore).getID();
 
     //check order
     MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());
@@ -1463,7 +1462,7 @@ public class MarketSellAssetActuatorTest {
     //check accountOrder
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore.get(ownerAddress);
     Assert.assertEquals(7, accountOrderCapsule.getCount());
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(6);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(6, orderStore).getID();
 
     //check order
     MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());
@@ -1563,12 +1562,12 @@ public class MarketSellAssetActuatorTest {
     //check accountOrder
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore.get(ownerAddress);
     Assert.assertEquals(1, accountOrderCapsule.getCount());
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(0);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(0, orderStore).getID();
 
     MarketAccountOrderCapsule makerAccountOrderCapsule = marketAccountStore.get(makerAddress);
     Assert.assertEquals(6, makerAccountOrderCapsule.getCount());
-    ByteString makerOrderId1 = makerAccountOrderCapsule.getOrdersList().get(0);
-    ByteString makerOrderId2 = makerAccountOrderCapsule.getOrdersList().get(1);
+    ByteString makerOrderId1 = makerAccountOrderCapsule.getOrderByIndex(0, orderStore).getID();
+    ByteString makerOrderId2 = makerAccountOrderCapsule.getOrderByIndex(1, orderStore).getID();
 
     //check order
     MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());
@@ -1676,12 +1675,12 @@ public class MarketSellAssetActuatorTest {
     //check accountOrder
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore.get(ownerAddress);
     Assert.assertEquals(1, accountOrderCapsule.getCount());
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(0);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(0, orderStore).getID();
 
     MarketAccountOrderCapsule makerAccountOrderCapsule = marketAccountStore.get(makerAddress);
     Assert.assertEquals(3, makerAccountOrderCapsule.getCount());
-    ByteString makerOrderId1 = makerAccountOrderCapsule.getOrdersList().get(0);
-    ByteString makerOrderId2 = makerAccountOrderCapsule.getOrdersList().get(1);
+    ByteString makerOrderId1 = makerAccountOrderCapsule.getOrderByIndex(0, orderStore).getID();
+    ByteString makerOrderId2 = makerAccountOrderCapsule.getOrderByIndex(1, orderStore).getID();
 
     //check order
     MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());
@@ -1789,12 +1788,12 @@ public class MarketSellAssetActuatorTest {
     //check accountOrder
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore.get(ownerAddress);
     Assert.assertEquals(1, accountOrderCapsule.getCount());
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(0);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(0, orderStore).getID();
 
     MarketAccountOrderCapsule makerAccountOrderCapsule = marketAccountStore.get(makerAddress);
     Assert.assertEquals(3, makerAccountOrderCapsule.getCount());
-    ByteString makerOrderId1 = makerAccountOrderCapsule.getOrdersList().get(0);
-    ByteString makerOrderId2 = makerAccountOrderCapsule.getOrdersList().get(1);
+    ByteString makerOrderId1 = makerAccountOrderCapsule.getOrderByIndex(0, orderStore).getID();
+    ByteString makerOrderId2 = makerAccountOrderCapsule.getOrderByIndex(1, orderStore).getID();
 
     //check order
     MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());
@@ -1901,12 +1900,12 @@ public class MarketSellAssetActuatorTest {
     //check accountOrder
     MarketAccountOrderCapsule accountOrderCapsule = marketAccountStore.get(ownerAddress);
     Assert.assertEquals(1, accountOrderCapsule.getCount());
-    ByteString orderId = accountOrderCapsule.getOrdersList().get(0);
+    ByteString orderId = accountOrderCapsule.getOrderByIndex(0, orderStore).getID();
 
     MarketAccountOrderCapsule makerAccountOrderCapsule = marketAccountStore.get(makerAddress);
     Assert.assertEquals(3, makerAccountOrderCapsule.getCount());
-    ByteString makerOrderId1 = makerAccountOrderCapsule.getOrdersList().get(0);
-    ByteString makerOrderId2 = makerAccountOrderCapsule.getOrdersList().get(1);
+    ByteString makerOrderId1 = makerAccountOrderCapsule.getOrderByIndex(0, orderStore).getID();
+    ByteString makerOrderId2 = makerAccountOrderCapsule.getOrderByIndex(1, orderStore).getID();
 
     //check order
     MarketOrderCapsule orderCapsule = orderStore.get(orderId.toByteArray());

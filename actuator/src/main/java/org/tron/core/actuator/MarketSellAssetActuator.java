@@ -530,7 +530,7 @@ public class MarketSellAssetActuator extends AbstractActuator {
 
 
   public MarketOrderCapsule createAndSaveOrder(AccountCapsule accountCapsule,
-      MarketSellAssetContract contract) {
+      MarketSellAssetContract contract) throws ItemNotFoundException {
 
     MarketAccountOrderCapsule marketAccountOrderCapsule = marketAccountStore
         .getUnchecked(contract.getOwnerAddress().toByteArray());
@@ -546,7 +546,7 @@ public class MarketSellAssetActuator extends AbstractActuator {
     long now = dynamicStore.getLatestBlockHeaderTimestamp();
     orderCapsule.setCreateTime(now);
 
-    marketAccountOrderCapsule.addOrders(orderCapsule.getID());
+    marketAccountOrderCapsule.addOrderToLinkedList(orderCapsule, orderStore);
     marketAccountOrderCapsule.setCount(marketAccountOrderCapsule.getCount() + 1);
     marketAccountStore.put(accountCapsule.createDbKey(), marketAccountOrderCapsule);
     orderStore.put(orderId, orderCapsule);
