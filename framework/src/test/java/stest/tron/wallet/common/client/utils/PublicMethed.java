@@ -105,6 +105,7 @@ import org.tron.protos.contract.ExchangeContract.ExchangeCreateContract;
 import org.tron.protos.contract.ExchangeContract.ExchangeInjectContract;
 import org.tron.protos.contract.ExchangeContract.ExchangeTransactionContract;
 import org.tron.protos.contract.ExchangeContract.ExchangeWithdrawContract;
+import org.tron.protos.contract.MarketContract.MarketSellAssetContract;
 import org.tron.protos.contract.ProposalContract.ProposalApproveContract;
 import org.tron.protos.contract.ProposalContract.ProposalCreateContract;
 import org.tron.protos.contract.ProposalContract.ProposalDeleteContract;
@@ -6146,6 +6147,55 @@ public class PublicMethed {
     Return ret = transaction.getResult();
     return ret;
   }
+
+  public static boolean sellMarketOrder(byte[] sellTokenID, byte[] buyTokenID,long sellTokenQuantity
+      ,long buyTokenQuantity,byte[] owner, String priKey,
+      WalletGrpc.WalletBlockingStub blockingStubFull) {
+    Wallet.setAddressPreFixByte(CommonConstant.ADD_PRE_FIX_BYTE_MAINNET);
+    //String priKey = testKey002;
+    ECKey temKey = null;
+    try {
+      BigInteger priK = new BigInteger(priKey, 16);
+      temKey = ECKey.fromPrivate(priK);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    }
+    final ECKey ecKey = temKey;
+
+
+    Integer times = 0;
+    while (times++ <= 2) {
+
+      MarketSellAssetContract.Builder builder = MarketSellAssetContract.newBuilder();
+      ByteString bsSellId = ByteString.copyFrom(sellTokenID);
+      ByteString bsBuyId = ByteString.copyFrom(buyTokenID);
+      ByteString bsOwner = ByteString.copyFrom(owner);
+      builder.setSellTokenId(bsSellId);
+      builder.setSellTokenQuantity(sellTokenQuantity);
+      builder.setBuyTokenId(bsBuyId);
+      builder.setBuyTokenQuantity(buyTokenQuantity);
+      builder.setOwnerAddress(bsOwner);
+
+      MarketSellAssetContract contract = builder.build();
+
+      TransactionExtention transactionExtention = blockingStubFull.marketSellAsset(contract);
+      Transaction transaction = transactionExtention.getTransaction();
+      if (transaction == null || transaction.getRawData().getContractCount() == 0) {
+        logger.info("transaction ==null");
+        continue;
+      }
+      transaction = signTransaction(ecKey, transaction);
+      GrpcAPI.Return response = broadcastTransaction(transaction, blockingStubFull);
+      return response.getResult();
+
+    }
+
+    return false;
+
+
+  }
+
+
 
   /**
    * constructor.
