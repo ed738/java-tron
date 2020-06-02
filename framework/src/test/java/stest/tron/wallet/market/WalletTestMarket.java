@@ -51,7 +51,7 @@ public class WalletTestMarket {
   List<String> accountAddressList = Lists.newArrayList();
   List<String> accountKeyList = Lists.newArrayList();
 
-  int newAccountNum = 300;
+  int newAccountNum = 500;
   int newOrderNum = 20;
 
   @BeforeSuite
@@ -80,6 +80,7 @@ public class WalletTestMarket {
 
     createAccount();
     sendCoin();
+//    sendToken();
 //    createMarketOrderWithoutMatch();
   }
 
@@ -111,6 +112,18 @@ public class WalletTestMarket {
       PublicMethed
           .sendcoin(accountAddress, 10_000_000L, ownerAddress, ownerKey, blockingStubFull);
       logger.info("sendcoin");
+    }
+
+  }
+
+  private void sendToken() {
+    String ownerKey = testKey006;
+    byte[] ownerAddress = fromAddress;
+    for (String address : accountAddressList) {
+      byte[] accountAddress = ByteArray.fromHexString(address);
+      PublicMethed
+          .transferAsset(accountAddress, "1000001".getBytes(),10_000_000L, ownerAddress, ownerKey, blockingStubFull);
+      logger.info("sendToken");
     }
 
   }
