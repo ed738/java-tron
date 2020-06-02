@@ -6181,7 +6181,10 @@ public class PublicMethed {
       TransactionExtention transactionExtention = blockingStubFull.marketSellAsset(contract);
       Transaction transaction = transactionExtention.getTransaction();
       if (transaction == null || transaction.getRawData().getContractCount() == 0) {
+        logger.info("bsOwner:"+WalletClient.encode58Check(bsOwner.toByteArray()));
         logger.info("transaction ==null");
+        logger.info("error message:" + ByteArray.toStr(transactionExtention.getResult().getMessage().toByteArray()));
+
         continue;
       }
       transaction = signTransaction(ecKey, transaction);
