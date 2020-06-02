@@ -4596,8 +4596,8 @@ public class PublicMethed {
     }
 
     if (response.getResult() == false) {
-      logger.info("Code = " + response.getCode());
-      logger.info("Message = " + response.getMessage().toStringUtf8());
+      logger.error("Code = " + response.getCode());
+      logger.error("Message = " + response.getMessage().toStringUtf8());
     }
     return response;
   }

@@ -147,7 +147,7 @@ public class MarketSellAssetActuator extends AbstractActuator {
         | InvalidProtocolBufferException
         | BalanceInsufficientException
         | ContractValidateException e) {
-      logger.debug(e.getMessage(), e);
+      logger.warn(e.getMessage(), e);
       ret.setStatus(fee, code.FAILED);
       throw new ContractExeException(e.getMessage());
     }

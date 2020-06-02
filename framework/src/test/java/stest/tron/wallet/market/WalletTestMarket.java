@@ -51,10 +51,10 @@ public class WalletTestMarket {
   List<String> accountAddressList = Lists.newArrayList();
   List<String> accountKeyList = Lists.newArrayList();
 
-  int newAccountNum = 500;
-//  int newAccountNum = 1;
-  int newOrderNum = 20;
-//  int newOrderNum = 1;
+//  int newAccountNum = 50;
+  int newAccountNum = 2;
+//  int newOrderNum = 20;
+  int newOrderNum = 1;
 
   @BeforeSuite
   public void beforeSuite() {
@@ -130,7 +130,7 @@ public class WalletTestMarket {
     for (String address : accountAddressList) {
       byte[] accountAddress = ByteArray.fromHexString(address);
       PublicMethed
-          .transferAsset(accountAddress, "1000001".getBytes(),10_000_000L, ownerAddress, ownerKey, blockingStubFull);
+          .transferAsset(accountAddress, "1000001".getBytes(),100_000_000L, ownerAddress, ownerKey, blockingStubFull);
       logger.info("sendToken");
     }
 
@@ -159,17 +159,6 @@ public class WalletTestMarket {
   public void createMarketOrder(byte[] sellTokenID, byte[] buyTokenID
       , long sellTokenQuantity, int buyTokenQuantityMax, int buyTokenQuantityMin) {
 
-    logger.info("wait 3000 for precondition");//
-    try {
-      Thread.sleep(3000);
-    } catch (Exception ex) {
-      ex.printStackTrace();
-    }
-    ExecutorService fixedThreadPool = Executors.newFixedThreadPool(100);
-
-//    byte[] sellTokenID = "_".getBytes();
-//    byte[] buyTokenID = "1000001".getBytes();
-//    long sellTokenQuantity = 2000;
 
     Integer j = 0;
 
