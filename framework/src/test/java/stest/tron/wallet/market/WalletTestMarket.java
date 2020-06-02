@@ -51,8 +51,8 @@ public class WalletTestMarket {
   List<String> accountAddressList = Lists.newArrayList();
   List<String> accountKeyList = Lists.newArrayList();
 
-  int newAccountNum = 500;
-  int newOrderNum = 10;
+  int newAccountNum = 300;
+  int newOrderNum = 20;
 
   @BeforeSuite
   public void beforeSuite() {
@@ -80,6 +80,7 @@ public class WalletTestMarket {
 
     createAccount();
     sendCoin();
+//    createMarketOrderWithoutMatch();
   }
 
   private void createAccount() {
@@ -108,31 +109,56 @@ public class WalletTestMarket {
     for (String address : accountAddressList) {
       byte[] accountAddress = ByteArray.fromHexString(address);
       PublicMethed
-          .sendcoin(accountAddress, 100000L, ownerAddress, ownerKey, blockingStubFull);
+          .sendcoin(accountAddress, 10_000_000L, ownerAddress, ownerKey, blockingStubFull);
       logger.info("sendcoin");
     }
 
   }
 
   @Test(enabled = true, threadPoolSize = 1, invocationCount = 1)
-  public void createMarketOrderWithoutMatch() throws Exception {
+  public void createMarketOrderWithoutMatch() {
+    byte[] sellTokenID = "_".getBytes();
+    byte[] buyTokenID = "1000001".getBytes();
+    long sellTokenQuantity = 2000;
+    createMarketOrder(sellTokenID, buyTokenID, sellTokenQuantity, 3000, 2000);
+//
+  }
+
+
+  //  @Test(enabled = true, threadPoolSize = 1, invocationCount = 1)
+  public void testCreateMarketOrderWithMatch() throws Exception {
+
+    byte[] sellTokenID = "1000001".getBytes();
+    byte[] buyTokenID = "_".getBytes();
+    long sellTokenQuantity = 3000;
+    createMarketOrder(sellTokenID, buyTokenID, sellTokenQuantity, 2000, 1000);
+  }
+
+  public void createMarketOrder(byte[] sellTokenID, byte[] buyTokenID
+      , long sellTokenQuantity, int buyTokenQuantityMax, int buyTokenQuantityMin) {
 
     logger.info("wait 9000 for precondition");//
-    Thread.sleep(9000);
+    try {
+      Thread.sleep(9000);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    }
     logger.info("createMarketOrderWithoutMatch");
     ExecutorService fixedThreadPool = Executors.newFixedThreadPool(100);
 
-    byte[] sellTokenID = "_".getBytes();
-    byte[] buyTokenID = "1000001".getBytes();
-    long sellTokenQuantity = 10;
+//    byte[] sellTokenID = "_".getBytes();
+//    byte[] buyTokenID = "1000001".getBytes();
+//    long sellTokenQuantity = 2000;
 
     Integer j = 0;
 
     long start = System.currentTimeMillis();
     while (j++ < newOrderNum) {
 
-      IntStream.range(0, accountAddressList.size()).parallel().forEach(i ->{
-        long buyTokenQuantity = Utils.getRandom().nextInt();
+      IntStream.range(0, accountAddressList.size()).parallel().forEach(i -> {
+        int randomNum = Utils.getRandom().nextInt((buyTokenQuantityMax - buyTokenQuantityMin) + 1)
+            + buyTokenQuantityMin;
+        long buyTokenQuantity = randomNum;
         if (buyTokenQuantity < 0) {
           buyTokenQuantity = -buyTokenQuantity;
         }
@@ -143,7 +169,7 @@ public class WalletTestMarket {
         byte[] accountAddress = ByteArray.fromHexString(address);
         boolean ret = false;
         try {
-           ret = PublicMethed
+          ret = PublicMethed
               .sellMarketOrder(sellTokenID, buyTokenID, sellTokenQuantity, buyTokenQuantity,
                   accountAddress, key, blockingStubFull);
         } catch (Exception ex) {
@@ -153,14 +179,18 @@ public class WalletTestMarket {
         logger.info("createMarketOrder");
       });
       long interval = System.currentTimeMillis() - start;
-      logger.info("interval:" +interval);
-      if(interval<3000){
-        Thread.sleep(3000 - interval);
+      logger.info("interval:" + interval);
+      if (interval < 3000) {
+        try {
+          Thread.sleep(3000 - interval);
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+
       }
       start = System.currentTimeMillis();
     }
   }
-
 
   /**
    * constructor.
@@ -168,7 +198,6 @@ public class WalletTestMarket {
 
   @AfterClass
   public void shutdown() throws InterruptedException {
-
 
     if (channelFull != null) {
       channelFull.shutdown().awaitTermination(5, TimeUnit.SECONDS);
