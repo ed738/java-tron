@@ -52,7 +52,9 @@ public class WalletTestMarket {
   List<String> accountKeyList = Lists.newArrayList();
 
   int newAccountNum = 500;
+//  int newAccountNum = 1;
   int newOrderNum = 20;
+//  int newOrderNum = 1;
 
   @BeforeSuite
   public void beforeSuite() {
@@ -80,8 +82,8 @@ public class WalletTestMarket {
 
     createAccount();
     sendCoin();
-//    sendToken();
-//    createMarketOrderWithoutMatch();
+    sendToken();
+    createMarketOrderWithoutMatch();
   }
 
   private void createAccount() {
@@ -128,7 +130,7 @@ public class WalletTestMarket {
 
   }
 
-  @Test(enabled = true, threadPoolSize = 1, invocationCount = 1)
+//  @Test(enabled = true, threadPoolSize = 1, invocationCount = 1)
   public void createMarketOrderWithoutMatch() {
     byte[] sellTokenID = "_".getBytes();
     byte[] buyTokenID = "1000001".getBytes();
@@ -138,8 +140,9 @@ public class WalletTestMarket {
   }
 
 
-  //  @Test(enabled = true, threadPoolSize = 1, invocationCount = 1)
+    @Test(enabled = true, threadPoolSize = 1, invocationCount = 1)
   public void testCreateMarketOrderWithMatch() throws Exception {
+
 
     byte[] sellTokenID = "1000001".getBytes();
     byte[] buyTokenID = "_".getBytes();
@@ -150,9 +153,9 @@ public class WalletTestMarket {
   public void createMarketOrder(byte[] sellTokenID, byte[] buyTokenID
       , long sellTokenQuantity, int buyTokenQuantityMax, int buyTokenQuantityMin) {
 
-    logger.info("wait 9000 for precondition");//
+    logger.info("wait 3000 for precondition");//
     try {
-      Thread.sleep(9000);
+      Thread.sleep(3000);
     } catch (Exception ex) {
       ex.printStackTrace();
     }
