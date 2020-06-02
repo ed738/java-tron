@@ -84,6 +84,12 @@ public class WalletTestMarket {
     sendCoin();
     sendToken();
     createMarketOrderWithoutMatch();
+    logger.info("wait 6000 for precondition");//
+    try {
+      Thread.sleep(6000);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    }
   }
 
   private void createAccount() {
@@ -159,7 +165,6 @@ public class WalletTestMarket {
     } catch (Exception ex) {
       ex.printStackTrace();
     }
-    logger.info("createMarketOrderWithoutMatch");
     ExecutorService fixedThreadPool = Executors.newFixedThreadPool(100);
 
 //    byte[] sellTokenID = "_".getBytes();
