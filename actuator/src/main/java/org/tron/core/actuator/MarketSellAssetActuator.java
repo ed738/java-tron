@@ -15,8 +15,10 @@
 
 package org.tron.core.actuator;
 
+import com.beust.jcommander.internal.Lists;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -319,6 +321,10 @@ public class MarketSellAssetActuator extends AbstractActuator {
         .getPriceKeysList(MarketUtils.getPairPriceHeadKey(makerSellTokenID, makerBuyTokenID),
             (long)(MAX_MATCH_NUM + 1), makerPriceNumber, true);
 
+    List<byte[]> a = new ArrayList<>();
+    pairPriceToOrderStore.forEach(entry->a.add(entry.getKey()));
+
+    int deleteCount = 0;
     int matchOrderCount = 0;
     // match different price
     while (takerCapsule.getSellTokenQuantityRemain() != 0) {
@@ -330,8 +336,17 @@ public class MarketSellAssetActuator extends AbstractActuator {
 
       byte[] pairPriceKey = priceKeysList.get(0);
 
+      List<byte[]> b = new ArrayList<>();
+      pairPriceToOrderStore.forEach(entry->b.add(entry.getKey()));
+
       // if not exists
-      MarketOrderIdListCapsule orderIdListCapsule = pairPriceToOrderStore.get(pairPriceKey);
+      MarketOrderIdListCapsule orderIdListCapsule = null;
+      try{
+        orderIdListCapsule = pairPriceToOrderStore.get(pairPriceKey);
+      }catch (Exception ex){
+        logger.error("",ex);
+      }
+//      MarketOrderIdListCapsule
 
       // match different orders which have the same price
       while (takerCapsule.getSellTokenQuantityRemain() != 0
@@ -356,6 +371,7 @@ public class MarketSellAssetActuator extends AbstractActuator {
 
       // the orders of makerPrice have been all consumed
       if (orderIdListCapsule.isOrderEmpty()) {
+        deleteCount++;
         pairPriceToOrderStore.delete(pairPriceKey);
 
         // need to delete marketPair if no more price(priceKeysList is empty after deleting)
