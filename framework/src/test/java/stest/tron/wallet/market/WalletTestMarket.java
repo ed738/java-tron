@@ -51,7 +51,7 @@ public class WalletTestMarket {
   List<String> accountAddressList = Lists.newArrayList();
   List<String> accountKeyList = Lists.newArrayList();
 
-  int newAccountNum = 500;
+  int newAccountNum = 100;
   int newOrderNum = 20;
 
   @BeforeSuite
@@ -139,7 +139,8 @@ public class WalletTestMarket {
     byte[] sellTokenID = "_".getBytes();
     byte[] buyTokenID = "1000001".getBytes();
     long sellTokenQuantity = 2000;
-    createMarketOrder(sellTokenID, buyTokenID, sellTokenQuantity, 3000, 2000);
+    createMarketOrder(sellTokenID, buyTokenID, sellTokenQuantity, 3000, 2000,
+        "create sell order");
 //
   }
 
@@ -151,11 +152,12 @@ public class WalletTestMarket {
     byte[] sellTokenID = "1000001".getBytes();
     byte[] buyTokenID = "_".getBytes();
     long sellTokenQuantity = 3000;
-    createMarketOrder(sellTokenID, buyTokenID, sellTokenQuantity, 2000, 1000);
+    createMarketOrder(sellTokenID, buyTokenID, sellTokenQuantity, 2000, 1000,
+        "create buy order");
   }
 
   public void createMarketOrder(byte[] sellTokenID, byte[] buyTokenID
-      , long sellTokenQuantity, int buyTokenQuantityMax, int buyTokenQuantityMin) {
+      , long sellTokenQuantity, int buyTokenQuantityMax, int buyTokenQuantityMin,String message) {
 
 
     Integer j = 0;
@@ -184,7 +186,7 @@ public class WalletTestMarket {
           logger.error("", ex);
         }
 
-        logger.info("createMarketOrder");
+        logger.info(message);
       });
       long interval = System.currentTimeMillis() - start;
       logger.info("interval:" + interval);
