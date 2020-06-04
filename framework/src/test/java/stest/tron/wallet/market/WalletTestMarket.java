@@ -51,7 +51,7 @@ public class WalletTestMarket {
   List<String> accountAddressList = Lists.newArrayList();
   List<String> accountKeyList = Lists.newArrayList();
 
-  int newAccountNum = 50;
+  int newAccountNum = 500;
   int newOrderNum = 20;
 
   @BeforeSuite
