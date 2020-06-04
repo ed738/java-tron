@@ -289,7 +289,7 @@ public class MarketSellAssetActuator extends AbstractActuator {
 
   /**
    * return marketPrice if matched, otherwise null
-   * */
+   */
   private MarketPrice hasMatch(List<byte[]> priceKeysList, MarketPrice takerPrice) {
     if (priceKeysList.isEmpty()) {
       return null;
@@ -319,12 +319,8 @@ public class MarketSellAssetActuator extends AbstractActuator {
     // get maker price list
     List<byte[]> priceKeysList = pairPriceToOrderStore
         .getPriceKeysList(MarketUtils.getPairPriceHeadKey(makerSellTokenID, makerBuyTokenID),
-            (long)(MAX_MATCH_NUM + 1), makerPriceNumber, true);
+            (long) (MAX_MATCH_NUM + 1), makerPriceNumber, true);
 
-    List<byte[]> a = new ArrayList<>();
-    pairPriceToOrderStore.forEach(entry->a.add(entry.getKey()));
-
-    int deleteCount = 0;
     int matchOrderCount = 0;
     // match different price
     while (takerCapsule.getSellTokenQuantityRemain() != 0) {
@@ -336,16 +332,8 @@ public class MarketSellAssetActuator extends AbstractActuator {
 
       byte[] pairPriceKey = priceKeysList.get(0);
 
-      List<byte[]> b = new ArrayList<>();
-      pairPriceToOrderStore.forEach(entry->b.add(entry.getKey()));
-
       // if not exists
-      MarketOrderIdListCapsule orderIdListCapsule = null;
-      try{
-        orderIdListCapsule = pairPriceToOrderStore.get(pairPriceKey);
-      }catch (Exception ex){
-        logger.error("",ex);
-      }
+      MarketOrderIdListCapsule orderIdListCapsule =  pairPriceToOrderStore.get(pairPriceKey);
 //      MarketOrderIdListCapsule
 
       // match different orders which have the same price
@@ -371,7 +359,6 @@ public class MarketSellAssetActuator extends AbstractActuator {
 
       // the orders of makerPrice have been all consumed
       if (orderIdListCapsule.isOrderEmpty()) {
-        deleteCount++;
         pairPriceToOrderStore.delete(pairPriceKey);
 
         // need to delete marketPair if no more price(priceKeysList is empty after deleting)

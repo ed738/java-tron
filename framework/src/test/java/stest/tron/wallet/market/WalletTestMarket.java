@@ -51,10 +51,8 @@ public class WalletTestMarket {
   List<String> accountAddressList = Lists.newArrayList();
   List<String> accountKeyList = Lists.newArrayList();
 
-//  int newAccountNum = 50;
-  int newAccountNum = 2;
-//  int newOrderNum = 20;
-  int newOrderNum = 1;
+  int newAccountNum = 50;
+  int newOrderNum = 20;
 
   @BeforeSuite
   public void beforeSuite() {
@@ -182,7 +180,7 @@ public class WalletTestMarket {
           ret = PublicMethed
               .sellMarketOrder(sellTokenID, buyTokenID, sellTokenQuantity, buyTokenQuantity,
                   accountAddress, key, blockingStubFull);
-        } catch (Exception ex) {
+         } catch (Exception ex) {
           logger.error("", ex);
         }
 
