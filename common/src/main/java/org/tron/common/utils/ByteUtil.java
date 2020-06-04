@@ -151,19 +151,6 @@ public class ByteUtil {
   }
 
   /**
-   * Convert a byte-array into a hex String.<br> Works similar to {@link Hex#toHexString} but allows
-   * for <code>null</code>
-   *
-   * @param data - byte-array to convert to a hex-string
-   * @return hex representation of the data.<br> Returns an empty String if the input is
-   * <code>null</code>
-   * @see Hex#toHexString
-   */
-  public static String toHexString(byte[] data) {
-    return data == null ? "" : Hex.toHexString(data);
-  }
-
-  /**
    * Cast hex encoded value from byte[] to int Limited to Integer.MAX_VALUE: 2^32-1 (4 bytes)
    *
    * @param b array contains the values
@@ -412,6 +399,15 @@ public class ByteUtil {
     }
 
     return ret;
+  }
+
+  public static void reverse(byte[] bytes) {
+    int len = bytes.length / 2;
+    for (int i = 0; i < len; i++) {
+      byte b = bytes[i];
+      bytes[i] = bytes[bytes.length - i - 1];
+      bytes[bytes.length - i - 1] = b;
+    }
   }
 
 }

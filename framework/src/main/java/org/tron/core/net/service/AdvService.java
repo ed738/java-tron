@@ -1,8 +1,8 @@
 package org.tron.core.net.service;
 
+import static org.tron.core.config.Parameter.ChainConstant.BLOCK_PRODUCED_INTERVAL;
 import static org.tron.core.config.Parameter.NetConstants.MAX_TRX_FETCH_PER_PEER;
 import static org.tron.core.config.Parameter.NetConstants.MSG_CACHE_DURATION_IN_BLOCKS;
-import static org.tron.core.config.args.Parameter.ChainConstant.BLOCK_PRODUCED_INTERVAL;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -234,9 +234,8 @@ public class AdvService {
         invToFetchCache.invalidate(item);
         return;
       }
-      peers.stream()
-          .filter(peer -> peer.getAdvInvReceive().getIfPresent(item) != null
-              && invSender.getSize(peer) < MAX_TRX_FETCH_PER_PEER)
+      peers.stream().filter(peer -> peer.getAdvInvReceive().getIfPresent(item) != null
+          && invSender.getSize(peer) < MAX_TRX_FETCH_PER_PEER)
           .sorted(Comparator.comparingInt(peer -> invSender.getSize(peer)))
           .findFirst().ifPresent(peer -> {
             invSender.add(item, peer);
@@ -262,7 +261,9 @@ public class AdvService {
 
     invToSpread.forEach((item, time) -> peers.forEach(peer -> {
       if (peer.getAdvInvReceive().getIfPresent(item) == null
-          && peer.getAdvInvSpread().getIfPresent(item) == null) {
+          && peer.getAdvInvSpread().getIfPresent(item) == null
+          && !(item.getType().equals(InventoryType.BLOCK)
+          && System.currentTimeMillis() - time > BLOCK_PRODUCED_INTERVAL)) {
         peer.getAdvInvSpread().put(item, Time.getCurrentMillis());
         invSender.add(item, peer);
       }

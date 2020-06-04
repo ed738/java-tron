@@ -1,7 +1,7 @@
 package org.tron.consensus.dpos;
 
-import static org.tron.core.config.args.Parameter.ChainConstant.BLOCK_PRODUCED_INTERVAL;
-import static org.tron.core.config.args.Parameter.ChainConstant.MAX_ACTIVE_WITNESS_NUM;
+import static org.tron.core.config.Parameter.ChainConstant.BLOCK_PRODUCED_INTERVAL;
+import static org.tron.core.config.Parameter.ChainConstant.MAX_ACTIVE_WITNESS_NUM;
 
 import com.google.protobuf.ByteString;
 import java.util.Random;
@@ -82,6 +82,11 @@ public class StateManager {
 
     ByteString witness = blockCapsule.getWitnessAddress();
     if (!dposService.getMiners().containsKey(witness)) {
+      return;
+    }
+
+    if (dposService.getBlockHandle().getState() != State.OK) {
+      dupBlockCount.set(1);
       return;
     }
 

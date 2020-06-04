@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
-import org.tron.common.args.Witness;
-import org.tron.common.args.Account;
 
 public class GenesisBlock implements Serializable {
 
@@ -71,10 +69,10 @@ public class GenesisBlock implements Serializable {
     try {
       long l = Long.parseLong(this.timestamp);
       if (l < 0) {
-        throw new IllegalArgumentException("Timestamp(" + timestamp + ") must be Long type.");
+        throw new IllegalArgumentException("Timestamp(" + timestamp + ") must be a Long type.");
       }
     } catch (NumberFormatException e) {
-      throw new IllegalArgumentException("Timestamp(" + timestamp + ") must be Long type.");
+      throw new IllegalArgumentException("Timestamp(" + timestamp + ") must be a Long type.");
     }
   }
 
